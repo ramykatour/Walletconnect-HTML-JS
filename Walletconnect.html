@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WalletConnect HTML</title>
+  <script src="https://cdn.jsdelivr.net/npm/web3modal"></script>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+</head>
+<body>
+  <h1>Connect Your Wallet</h1>
+  <button id="connectWalletBtn">Connect Wallet</button>
+
+  <script type="text/javascript">
+    const providerOptions = {
+      walletconnect: {
+        package: WalletConnectProvider.default, 
+        options: {
+          rpc: {
+            97: "https://data-seed-prebsc-1-s1.binance.org:8545", 
+            56: "https://bsc-dataseed.binance.org/"
+          }
+        }
+      }
+    };
+    const web3Modal = new Web3Modal.default({
+      cacheProvider: false, 
+      providerOptions,
+      theme: "dark"
+    });
+
+    async function connectWallet() {
+      try {
+        const provider = await web3Modal.connect();
+        const ethersProvider = new ethers.providers.Web3Provider(provider);
+        const signer = ethersProvider.getSigner();
+        const userAddress = await signer.getAddress();
+        const network = await ethersProvider.getNetwork();
+
+        console.log(`Connected wallet address: ${userAddress}`);
+        console.log(`Connected network chainId: ${network.chainId}`);
+        if (network.chainId !== 97) {
+          alert('Please connect to Binance Smart Chain Testnet (Chain ID: 97).');
+          return;
+        }
+        window.location.href = 'game.html';
+
+      } catch (error) {
+        console.error('Error connecting to wallet:', error);
+      }
+    }
+    document.getElementById('connectWalletBtn').addEventListener('click', connectWallet);
+  </script>
+</body>
+</html>
